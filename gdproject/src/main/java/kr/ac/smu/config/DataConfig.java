@@ -23,8 +23,8 @@ public class DataConfig {
         SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
         dataSource.setDriverClass(org.mariadb.jdbc.Driver.class);
         dataSource.setUsername("root");
-        dataSource.setUrl("jdbc:mariadb://gpdb.c8yiiz97zabv.ap-southeast-1.rds.amazonaws.com/test");
-        dataSource.setPassword("as242526");
+        dataSource.setUrl("");
+        dataSource.setPassword("");
         return dataSource;
     }
 
