@@ -27,6 +27,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -87,8 +88,10 @@ public class FoodSelectorController {
 		logger.info(new Date()+"/completerandom POST Request");
 		return place_list;
 	}
+	
 
-	//커스텀추가 
+
+	//커스텀랜덤
 	@RequestMapping(value="/customrandom", method=RequestMethod.POST)
 	@ResponseBody
 	public Map<Integer,PlaceDTO> customRandom(HttpServletRequest req) throws ParseException{
@@ -105,7 +108,23 @@ public class FoodSelectorController {
 			customData.put(i, placeList.get(i));
 		return customData;
 	}
-
+	
+	//커스텀추가 
+	//param: placeDTO, CustomName, userId 
+	@RequestMapping(value="/addcustom", method=RequestMethod.POST)
+	@ResponseBody
+	public boolean addCustom(PlaceDTO place, HttpServletRequest req) throws ParseException{
+			String user_id=req.getParameter("userId");
+			String customName=req.getParameter("customName");
+			try{
+				customInfoService.addCustom(place, user_id, customName);
+			}catch(Exception e)
+			{
+				logger.error(e.getMessage());
+				return false;
+			}
+			return true;
+		}
 
 
 }
