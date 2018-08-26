@@ -1,5 +1,6 @@
 package kr.ac.smu;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,6 +29,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import kr.ac.smu.DTO.PlaceDTO;
 import kr.ac.smu.service.CustomInfoService;
 
@@ -45,7 +50,7 @@ public class FoodSelectorController {
 	// 완전 랜덤
 	@RequestMapping(value="/completerandom", method=RequestMethod.POST,produces="application/json;charset=UTF-8" )
 	@ResponseBody
-	public Map<Integer,PlaceDTO> completeRandom(HttpServletRequest req) throws ParseException{
+	public Map<Integer,PlaceDTO> completeRandom(HttpServletRequest req) throws ParseException, JsonParseException, JsonMappingException, IOException{
 		RestTemplate restTemplate = new RestTemplate(); 
 
 		HttpHeaders headers = new HttpHeaders(); 
@@ -69,29 +74,21 @@ public class FoodSelectorController {
 		JSONArray docuArray = (JSONArray) jsonObject.get("documents");
 		//documents만 뽑아오고  
 
-		
+		ObjectMapper mapper=new ObjectMapper();
+		PlaceDTO place;
 		Map<Integer, PlaceDTO> place_list=new HashMap<Integer,PlaceDTO>();
 		for(int i=0; i<15; i++){
 			JSONObject obj=(JSONObject) docuArray.get(i);
-			PlaceDTO info=new PlaceDTO();
-			info.setId(obj.get("id").toString());	
-			info.setPlace_name(obj.get("place_name").toString());
-			info.setCategory_name(obj.get("category_name").toString());
-			info.setPhone(obj.get("phone").toString());
-			info.setAddress_name(obj.get("address_name").toString());
-			info.setRoad_address_name(obj.get("road_address_name").toString());
-			info.setX(obj.get("x").toString());
-			info.setY(obj.get("y").toString());
-			info.setPlace_url(obj.get("place_url").toString());
-			info.setDistance(obj.get("distance").toString());
-
-			place_list.put(i+1,info);
+			place = mapper.readValue(obj.toString(), PlaceDTO.class);
+			
+			place_list.put(i+1,place);
 		}
 		
 		logger.info(new Date()+"/completerandom POST Request");
 		return place_list;
 	}
 
+	//커스텀추가 
 	@RequestMapping(value="/customrandom", method=RequestMethod.POST)
 	@ResponseBody
 	public Map<Integer,PlaceDTO> customRandom(HttpServletRequest req) throws ParseException{

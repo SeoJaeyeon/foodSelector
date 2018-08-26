@@ -1,4 +1,5 @@
 package kr.ac.smu;
+import java.io.IOException;
 import java.net.URI;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,6 +19,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import kr.ac.smu.DTO.PlaceDTO;
+
 @Controller
 public class KaKaoAPIServerController {
 	@Value("${setting.appKey}")
@@ -25,7 +32,7 @@ public class KaKaoAPIServerController {
 	
 	@RequestMapping(value="/crandom", method=RequestMethod.GET,produces = "application/json; charset=utf8")
 	@ResponseBody
-	public String completeRandom(HttpServletRequest req) throws ParseException{
+	public PlaceDTO completeRandom(HttpServletRequest req) throws ParseException, JsonParseException, JsonMappingException, IOException{
 		RestTemplate restTemplate = new RestTemplate(); 
 		HttpHeaders headers = new HttpHeaders(); 
 		headers.add("Content-Type", "application/json;charset=UTF-8");
@@ -41,10 +48,13 @@ public class KaKaoAPIServerController {
 		JSONObject jsonObject = (JSONObject) jsonParser.parse(response.getBody().toString()); 
 		
 		JSONArray docuArray = (JSONArray) jsonObject.get("documents");
+		
+		ObjectMapper mapper=new ObjectMapper();
+		PlaceDTO bean = mapper.readValue(docuArray.get(0).toString(), PlaceDTO.class);
 
 		 
-		JSONObject obj=(JSONObject) docuArray.get(0);
+		//JSONObject obj=(JSONObject) docuArray.get(0);
 
-		return docuArray.get(0).toString();		
+		return bean;
 	}
 }
