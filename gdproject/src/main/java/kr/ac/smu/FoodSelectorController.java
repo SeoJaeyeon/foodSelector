@@ -34,16 +34,21 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import kr.ac.smu.DTO.CustomDTO;
+import kr.ac.smu.DTO.CustomPlaceDTO;
 import kr.ac.smu.DTO.PlaceDTO;
 import kr.ac.smu.service.CustomInfoService;
+import kr.ac.smu.service.KakaoLocalAPIService;
 
 
 @Controller
 @PropertySource("classpath:settingKey.properties")
 public class FoodSelectorController {
+	
 	Logger logger = LoggerFactory.getLogger(FoodSelectorController.class);
-	@Value("${setting.appKey}")
-	private String appKey;
+	
+	@Autowired 
+	private KakaoLocalAPIService kakaoLocalAPIService;
 	
 	@Autowired
 	private CustomInfoService customInfoService;
@@ -51,62 +56,54 @@ public class FoodSelectorController {
 	// 완전 랜덤
 	@RequestMapping(value="/completerandom", method=RequestMethod.POST,produces="application/json;charset=UTF-8" )
 	@ResponseBody
-	public Map<Integer,PlaceDTO> completeRandom(HttpServletRequest req) throws ParseException, JsonParseException, JsonMappingException, IOException{
-		RestTemplate restTemplate = new RestTemplate(); 
-
-		HttpHeaders headers = new HttpHeaders(); 
-
-		headers.add("Content-Type", "application/json;charset=UTF-8");
-		headers.set("Authorization", appKey); //appKey 설정 ,KakaoAK kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk 이 형식 준수
-
-		HttpEntity entity = new HttpEntity("parameters", headers); 
-		URI url=URI.create("https://dapi.kakao.com/v2/local/search/keyword.json?query=%EA%B9%80%EC%B9%98%EC%B0%8C%EA%B0%9C&size=15&category_group_code=FD6&x="+req.getParameter("x")+"&y="+req.getParameter("y")); 
-		//x -> x좌표, y -> y좌표 
-
-		ResponseEntity response= restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
-		//String 타입으로 받아오면 JSON 객체 형식으로 넘어옴
+	public Map<Integer,CustomPlaceDTO> completeRandom(HttpServletRequest req) throws ParseException, JsonParseException, JsonMappingException, IOException{
+	
+		ResponseEntity response= kakaoLocalAPIService.complete(req.getParameter("x"), req.getParameter("y"));
+		
+		Map<Integer,CustomPlaceDTO> place_list;
+		try{
+			place_list=parse(response);
+		}catch(Exception e){
+			return null;
+		}
+		
+		return place_list;
+	}
+	
+	public Map<Integer, CustomPlaceDTO> parse(ResponseEntity res) throws ParseException, JsonParseException, JsonMappingException, IOException{
 
 		JSONParser jsonParser = new JSONParser(); 
-		JSONObject jsonObject = (JSONObject) jsonParser.parse(response.getBody().toString()); 
+		JSONObject jsonObject = (JSONObject) jsonParser.parse(res.getBody().toString()); 
 
-		//저는 Body 부분만 사용할거라 getBody 후 JSON 타입을 인자로 넘겨주었습니다
-
-		//헤더도 필요하면 getBody()는 사용할 필요가 없겠쥬
 		JSONArray docuArray = (JSONArray) jsonObject.get("documents");
-		//documents만 뽑아오고  
-
+ 
 		ObjectMapper mapper=new ObjectMapper();
-		PlaceDTO place;
-		Map<Integer, PlaceDTO> place_list=new HashMap<Integer,PlaceDTO>();
+		CustomPlaceDTO place;
+		Map<Integer, CustomPlaceDTO> place_list=new HashMap<Integer,CustomPlaceDTO>();
 		for(int i=0; i<15; i++){
 			JSONObject obj=(JSONObject) docuArray.get(i);
-			place = mapper.readValue(obj.toString(), PlaceDTO.class);
+			place = (CustomPlaceDTO)mapper.readValue(obj.toString(), CustomPlaceDTO.class);
 			
 			place_list.put(i+1,place);
 		}
 		
-		logger.info(new Date()+"/completerandom POST Request");
 		return place_list;
 	}
-	
 
 
-	//커스텀랜덤
-	@RequestMapping(value="/customrandom", method=RequestMethod.POST)
+	//커스텀조회
+	/*
+	 * parameter: userId, customName
+	 */
+	@RequestMapping(value="/customrandom", method=RequestMethod.GET)
 	@ResponseBody
-	public Map<Integer,PlaceDTO> customRandom(HttpServletRequest req) throws ParseException{
+	public Map<Integer,CustomPlaceDTO> customRandom(HttpServletRequest req) throws ParseException{
 		String userId=req.getParameter("userId");
 		String customName=req.getParameter("customName");
-		List<String> placeidList=customInfoService.selectAllCustomId(userId, customName);
-		logger.info(userId+", "+customName);
-		List<PlaceDTO> placeList=new ArrayList<PlaceDTO>();
-		for(int i=0; i<placeidList.size(); i++){
-			placeList.add(customInfoService.selectPlaceByCustomId(placeidList.get(i)));
-		}
-		Map<Integer,PlaceDTO> customData=new HashMap<Integer,PlaceDTO>();
-		for(int i=0; i<placeList.size(); i++)
-			customData.put(i, placeList.get(i));
-		return customData;
+		
+		Map<Integer, CustomPlaceDTO> customs=customInfoService.selectAllCustomsByCustomName(userId, customName);
+		
+		return customs;
 	}
 	
 	//커스텀추가 

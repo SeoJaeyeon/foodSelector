@@ -42,8 +42,7 @@ public class KaKaoAPIServerController {
 		HttpEntity entity = new HttpEntity("parameters", headers); 
 		URI url=URI.create("https://dapi.kakao.com/v2/local/search/keyword.json?query=%EA%B9%80%EC%B9%98%EC%B0%8C%EA%B0%9C&category_group_code=FD6&x="+req.getParameter("x")+"&y="+req.getParameter("y")); 
 		ResponseEntity response= restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
-		//String 타입으로 받아오면 JSON 객체 형식으로 넘어옴
-		
+
 		JSONParser jsonParser = new JSONParser(); 
 		JSONObject jsonObject = (JSONObject) jsonParser.parse(response.getBody().toString()); 
 		
@@ -52,8 +51,7 @@ public class KaKaoAPIServerController {
 		ObjectMapper mapper=new ObjectMapper();
 		PlaceDTO bean = mapper.readValue(docuArray.get(0).toString(), PlaceDTO.class);
 
-		 
-		//JSONObject obj=(JSONObject) docuArray.get(0);
+
 
 		return bean;
 	}
