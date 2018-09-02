@@ -16,7 +16,7 @@ public class KakaoLocalAPIServiceImpl implements KakaoLocalAPIService {
 	private String appKey;
 	
 	@Override
-	public ResponseEntity complete(String x, String y) {
+	public ResponseEntity<String> complete(String x, String y) {
 		RestTemplate restTemplate = new RestTemplate(); 
 
 		HttpHeaders headers = new HttpHeaders(); 
@@ -24,16 +24,16 @@ public class KakaoLocalAPIServiceImpl implements KakaoLocalAPIService {
 		headers.add("Content-Type", "application/json;charset=UTF-8");
 		headers.set("Authorization", appKey);
 
-		HttpEntity entity = new HttpEntity("parameters", headers); 
+		HttpEntity<String> entity = new HttpEntity<String>("parameters", headers); 
 		URI url=URI.create("https://dapi.kakao.com/v2/local/search/keyword.json?query=%EA%B9%80%EC%B9%98%EC%B0%8C%EA%B0%9C&size=15&category_group_code=FD6&x="+x+"&y="+y); 
 
-		ResponseEntity response= restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+		ResponseEntity<String> response= restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 		
 		return response;
 	}
 
 	@Override
-	public ResponseEntity keyword(String x, String y, String keyword) {
+	public ResponseEntity<String> keyword(String x, String y, String keyword) {
 		// TODO Auto-generated method stub
 		return null;
 	}

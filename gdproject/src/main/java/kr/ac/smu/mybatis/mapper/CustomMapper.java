@@ -2,6 +2,7 @@ package kr.ac.smu.mybatis.mapper;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -18,5 +19,8 @@ public interface CustomMapper {
 
 	@Insert("INSERT INTO custom VALUES(#{pre.userId},#{pre.id},#{pre.customName}")
 	public void insertCustom(@Param("pre") CustomDTO pre);
+	
+	@Delete("DELETE FROM custom WHERE user_id=#{user_id} and id=#{id} and customName=#{customName}")
+	public void deleteCustom(@Param("user_id") String user_id, @Param("id") String id, @Param("customName") String customName);
 	
 }	

@@ -1,11 +1,7 @@
 package kr.ac.smu;
 
 import java.io.IOException;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,31 +13,23 @@ import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.client.HttpServerErrorException;
-import org.springframework.web.client.RestTemplate;
-
+import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import kr.ac.smu.DTO.CustomDTO;
+
 import kr.ac.smu.DTO.CustomPlaceDTO;
 import kr.ac.smu.DTO.PlaceDTO;
 import kr.ac.smu.service.CustomInfoService;
 import kr.ac.smu.service.KakaoLocalAPIService;
 
 
-@Controller
+@RestController
 @PropertySource("classpath:settingKey.properties")
 public class FoodSelectorController {
 	
@@ -52,14 +40,15 @@ public class FoodSelectorController {
 	
 	@Autowired
 	private CustomInfoService customInfoService;
-	
+
 	// 완전 랜덤
-	@RequestMapping(value="/completerandom", method=RequestMethod.POST,produces="application/json;charset=UTF-8" )
-	@ResponseBody
+	/*
+	 * parameter= x, y
+	 */
+	@RequestMapping(value="/completerandom", method={RequestMethod.POST, RequestMethod.GET},produces="application/json;charset=UTF-8" )
 	public Map<Integer,CustomPlaceDTO> completeRandom(HttpServletRequest req) throws ParseException, JsonParseException, JsonMappingException, IOException{
 	
-		ResponseEntity response= kakaoLocalAPIService.complete(req.getParameter("x"), req.getParameter("y"));
-		
+		ResponseEntity<String> response= kakaoLocalAPIService.complete(req.getParameter("x"), req.getParameter("y"));
 		Map<Integer,CustomPlaceDTO> place_list;
 		try{
 			place_list=parse(response);
@@ -70,8 +59,10 @@ public class FoodSelectorController {
 		return place_list;
 	}
 	
-	public Map<Integer, CustomPlaceDTO> parse(ResponseEntity res) throws ParseException, JsonParseException, JsonMappingException, IOException{
 
+	
+	public Map<Integer, CustomPlaceDTO> parse(ResponseEntity<String> res) throws ParseException, JsonParseException, JsonMappingException, IOException{
+		System.out.println(res);
 		JSONParser jsonParser = new JSONParser(); 
 		JSONObject jsonObject = (JSONObject) jsonParser.parse(res.getBody().toString()); 
 
@@ -82,24 +73,22 @@ public class FoodSelectorController {
 		Map<Integer, CustomPlaceDTO> place_list=new HashMap<Integer,CustomPlaceDTO>();
 		for(int i=0; i<15; i++){
 			JSONObject obj=(JSONObject) docuArray.get(i);
-			place = (CustomPlaceDTO)mapper.readValue(obj.toString(), CustomPlaceDTO.class);
+			place = (CustomPlaceDTO)mapper.readValue(obj.toString(), PlaceDTO.class);
 			
 			place_list.put(i+1,place);
 		}
-		
+
 		return place_list;
 	}
-
-
+	
 	//커스텀조회
 	/*
 	 * parameter: userId, customName
 	 */
-	@RequestMapping(value="/customrandom", method=RequestMethod.GET)
-	@ResponseBody
+	@RequestMapping(value="/customrandom", method={RequestMethod.POST, RequestMethod.GET})
 	public Map<Integer,CustomPlaceDTO> customRandom(HttpServletRequest req) throws ParseException{
-		String userId=req.getParameter("userId");
-		String customName=req.getParameter("customName");
+		String userId=req.getParameter("user_id");
+		String customName=req.getParameter("custom_name");
 		
 		Map<Integer, CustomPlaceDTO> customs=customInfoService.selectAllCustomsByCustomName(userId, customName);
 		
@@ -107,21 +96,25 @@ public class FoodSelectorController {
 	}
 	
 	//커스텀추가 
-	//param: placeDTO, CustomName, userId 
-	@RequestMapping(value="/addcustom", method=RequestMethod.POST)
-	@ResponseBody
-	public boolean addCustom(PlaceDTO place, HttpServletRequest req) throws ParseException{
-			String user_id=req.getParameter("userId");
-			String customName=req.getParameter("customName");
-			try{
-				customInfoService.addCustom(place, user_id, customName);
-			}catch(Exception e)
-			{
-				logger.error(e.getMessage());
-				return false;
-			}
+	/*
+	 * parameter: place, user_id, custom_name
+	 */
+	@RequestMapping(value="/addcustom", method={RequestMethod.POST, RequestMethod.GET})
+	public boolean addCustom(CustomPlaceDTO place, HttpServletRequest req) throws ParseException{
+			customInfoService.addCustom(place, req.getParameter("user_id"),req.getParameter("custom_name") );
 			return true;
-		}
+	}
+	
+	//커스텀 삭제 
+	/*
+	 * parameter: id, uesr_id, custom_name
+	 */
+	@RequestMapping(value="/deletecustom", method={RequestMethod.POST, RequestMethod.GET})
+	public boolean deleteCustom(HttpServletRequest req) throws ParseException{
+			customInfoService.deleteCustom(req.getParameter("id"), req.getParameter("user_id"), req.getParameter("custom_name"));
+			return true;
+	}
+	
 
 
 }

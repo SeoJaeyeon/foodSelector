@@ -39,9 +39,9 @@ public class KaKaoAPIServerController {
 
 		headers.set("Authorization", appKey); //appKey 설정 ,KakaoAK kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk 이 형식 준수
 
-		HttpEntity entity = new HttpEntity("parameters", headers); 
+		HttpEntity<String> entity = new HttpEntity<String> ("parameters", headers); 
 		URI url=URI.create("https://dapi.kakao.com/v2/local/search/keyword.json?query=%EA%B9%80%EC%B9%98%EC%B0%8C%EA%B0%9C&category_group_code=FD6&x="+req.getParameter("x")+"&y="+req.getParameter("y")); 
-		ResponseEntity response= restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+		ResponseEntity<String>  response= restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 
 		JSONParser jsonParser = new JSONParser(); 
 		JSONObject jsonObject = (JSONObject) jsonParser.parse(response.getBody().toString()); 
