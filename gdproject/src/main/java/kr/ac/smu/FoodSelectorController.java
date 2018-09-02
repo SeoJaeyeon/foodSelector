@@ -59,7 +59,23 @@ public class FoodSelectorController {
 		return place_list;
 	}
 	
+	//키워드 랜덤
+	/*
+	 * parameter = x, y, keyword
+	 */
+	@RequestMapping(value="/keywordrandom", method={RequestMethod.POST, RequestMethod.GET},produces="application/json;charset=UTF-8")
+	public Map<Integer, CustomPlaceDTO> keywordRandom(HttpServletRequest req){
 
+		ResponseEntity<String> response= kakaoLocalAPIService.keyword(req.getParameter("x"), req.getParameter("y"),req.getParameter("keyword"));
+		Map<Integer,CustomPlaceDTO> place_list;
+		try{
+			place_list=parse(response);
+		}catch(Exception e){
+			return null;
+		}
+		
+		return place_list;
+	}
 	
 	public Map<Integer, CustomPlaceDTO> parse(ResponseEntity<String> res) throws ParseException, JsonParseException, JsonMappingException, IOException{
 		System.out.println(res);

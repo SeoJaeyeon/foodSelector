@@ -1,6 +1,5 @@
 package kr.ac.smu;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -47,7 +46,16 @@ public class KaKaoAPIServerControllerTest {
 	                .andDo(print())
 	                .andExpect(status().isOk());        
 	}
-	
+	@Test
+	public void testKaKaoAPIkeyword() throws Exception{
+	        this.mockMvc.perform(
+	                post("/keywordrandom")
+	                    .param("x", "127.213123")
+	                    .param("y", "65.213123")  
+	        			.param("keyword", "pasta"))
+	                .andDo(print())
+	                .andExpect(status().isOk());        
+	}
 	@After
 	public void after(){
 		logger.info("after");

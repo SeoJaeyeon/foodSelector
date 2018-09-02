@@ -2,6 +2,7 @@ package kr.ac.smu.service;
 
 import java.net.URI;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -14,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 public class KakaoLocalAPIServiceImpl implements KakaoLocalAPIService {
 	@Value("${setting.appKey}")
 	private String appKey;
+	
 	
 	@Override
 	public ResponseEntity<String> complete(String x, String y) {
@@ -34,8 +36,20 @@ public class KakaoLocalAPIServiceImpl implements KakaoLocalAPIService {
 
 	@Override
 	public ResponseEntity<String> keyword(String x, String y, String keyword) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		RestTemplate restTemplate = new RestTemplate(); 
+
+		HttpHeaders headers = new HttpHeaders(); 
+
+		headers.add("Content-Type", "application/json;charset=UTF-8");
+		headers.set("Authorization", appKey);
+
+		HttpEntity<String> entity = new HttpEntity<String>("parameters", headers); 
+		URI url=URI.create("https://dapi.kakao.com/v2/local/search/keyword.json?query="+keyword+"&category_group_code=FD6&x="+x+"&y="+y+"&sort=accuracy&size=15"); 
+
+		ResponseEntity<String> response= restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+		
+		return response;
 	}
 
 }
