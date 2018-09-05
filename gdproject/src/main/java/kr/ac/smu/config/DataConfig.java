@@ -16,6 +16,11 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 
 import kr.ac.smu.mybatis.mapper.CustomMapper;
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @Configuration
 @MapperScan(basePackages="kr.ac.smu.mybatis.mapper")
@@ -52,6 +57,8 @@ public class DataConfig {
         sessionFactory.setDataSource(dataSource());
         return sessionFactory;
     }
+    
+
 
 
 }

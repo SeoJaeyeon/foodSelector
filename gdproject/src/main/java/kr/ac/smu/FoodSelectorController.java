@@ -97,6 +97,15 @@ public class FoodSelectorController {
 		return place_list;
 	}
 	
+	//커스텀목록 조회
+	/*
+	 * parameter: user_id
+	 */
+	@RequestMapping(value="/customlist", method={RequestMethod.POST, RequestMethod.GET})
+	public Map<Integer, String> customList(String user_id){
+		return customInfoService.selectCustomListById(user_id);
+	}
+	
 	//커스텀조회
 	/*
 	 * parameter: userId, customName
@@ -116,8 +125,8 @@ public class FoodSelectorController {
 	 * parameter: place, user_id, custom_name
 	 */
 	@RequestMapping(value="/addcustom", method={RequestMethod.POST, RequestMethod.GET})
-	public boolean addCustom(CustomPlaceDTO place, HttpServletRequest req) throws ParseException{
-			customInfoService.addCustom(place, req.getParameter("user_id"),req.getParameter("custom_name") );
+	public boolean addCustom(CustomPlaceDTO place, String user_id, String custom_name) throws ParseException{
+			customInfoService.addCustom(place,user_id, custom_name );
 			return true;
 	}
 	

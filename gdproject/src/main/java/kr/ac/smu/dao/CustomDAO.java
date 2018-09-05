@@ -17,6 +17,10 @@ public class CustomDAO {
 	
 	@Autowired
 	private CustomMapper customMapper;
+	
+	public List<String> findCustomListById(String userId){
+		return customMapper.selectCustomList(userId);
+	}
 
 	public List<String> findAllCustomIdByCustomName(String userId, String customName){
 		return customMapper.selectCustom(userId, customName);

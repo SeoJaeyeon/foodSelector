@@ -57,6 +57,16 @@ public class CustomInfoServiceImpl implements CustomInfoService {
 		customDao.deleteCustom(id, user_id, custom_name);
 		return true;
 	}
+
+	@Override
+	public Map<Integer, String> selectCustomListById(String userId) {
+		Map<Integer,String> customList=new HashMap<Integer, String>();
+		List<String> list=customDao.findCustomListById(userId);
+		
+		for(int i=1; i<=list.size();i++)
+			customList.put(i, list.get(i-1));
+		return customList;
+	}
 	
 
 }
