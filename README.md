@@ -14,7 +14,7 @@
 
 **시스템 구조**
 
-![system-architecture](https://github.com/SeoJaeyeon/foodSelector/blob/master/img/system-architecture.PNG?raw=true)
+![system-architecture](https://github.com/SeoJaeyeon/foodSelector/blob/master/img/system-architecture.png?raw=true)
 
 
 
