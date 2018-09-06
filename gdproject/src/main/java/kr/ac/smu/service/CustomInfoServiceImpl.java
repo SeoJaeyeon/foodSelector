@@ -39,15 +39,12 @@ public class CustomInfoServiceImpl implements CustomInfoService {
 	public boolean addCustom(CustomPlaceDTO place, String user_id, String customName) {
 		if(placeDao.findCustomPlaceById(place.getId())==null)
 			placeDao.insertCustomPlace(place);
-		try{
-			CustomDTO custom=new CustomDTO();
-			custom.setCustomName(customName);
-			custom.setId(place.getId());
-			custom.setUser_id(user_id);
-			customDao.insertCustomData(custom);
-		}catch(Exception e){
-			return false;
-		}	
+		CustomDTO custom=new CustomDTO();
+		custom.setCustomName(customName);
+		custom.setId(place.getId());
+		custom.setUser_id(user_id);
+		customDao.insertCustomData(custom);
+
 		return true;
 		
 	}

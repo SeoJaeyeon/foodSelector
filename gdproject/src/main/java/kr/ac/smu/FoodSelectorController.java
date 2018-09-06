@@ -111,9 +111,9 @@ public class FoodSelectorController {
 	 * parameter: userId, customName
 	 */
 	@RequestMapping(value="/customrandom", method={RequestMethod.POST, RequestMethod.GET})
-	public Map<Integer,CustomPlaceDTO> customRandom(HttpServletRequest req) throws ParseException{
-		String userId=req.getParameter("user_id");
-		String customName=req.getParameter("custom_name");
+	public Map<Integer,CustomPlaceDTO> customRandom(String user_id, String custom_name) throws ParseException{
+		String userId=user_id;
+		String customName=custom_name;
 		
 		Map<Integer, CustomPlaceDTO> customs=customInfoService.selectAllCustomsByCustomName(userId, customName);
 		
@@ -135,8 +135,8 @@ public class FoodSelectorController {
 	 * parameter: id, uesr_id, custom_name
 	 */
 	@RequestMapping(value="/deletecustom", method={RequestMethod.POST, RequestMethod.GET})
-	public boolean deleteCustom(HttpServletRequest req) throws ParseException{
-			customInfoService.deleteCustom(req.getParameter("id"), req.getParameter("user_id"), req.getParameter("custom_name"));
+	public boolean deleteCustom(String id, String user_id, String custom_name, HttpServletRequest req) throws ParseException{
+			customInfoService.deleteCustom(id,user_id,custom_name);
 			return true;
 	}
 	
