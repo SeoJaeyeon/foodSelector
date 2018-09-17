@@ -28,3 +28,9 @@
 
 : DB에 커스텀 테이블을 구축하여 사용자가 음식점을 추가, 삭제할 수 있도록 하고 커스텀 카테고리 또한 추가, 삭제 할 수 있도록 함
 
+
+
+**시연영상(음성제거이후로 약간 끊기는 점 양해부탁드립니다.)**
+
+  [![Video Label](http://img.youtube.com/vi/uLR1RNqJ1Mw/0.jpg)](https://youtu.be/BYCYYtDsTN0)
+
